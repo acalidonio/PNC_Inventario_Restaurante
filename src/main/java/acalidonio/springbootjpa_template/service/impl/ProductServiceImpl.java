@@ -6,6 +6,7 @@ import acalidonio.springbootjpa_template.domain.dto.request.UpdateProductRequest
 import acalidonio.springbootjpa_template.domain.dto.response.PageableResponse;
 import acalidonio.springbootjpa_template.domain.dto.response.ProductResponse;
 import acalidonio.springbootjpa_template.domain.entities.Product;
+import acalidonio.springbootjpa_template.exceptions.BusinessRuleException;
 import acalidonio.springbootjpa_template.exceptions.ResourceNotFoundException;
 import acalidonio.springbootjpa_template.repository.ProductRepository;
 import acalidonio.springbootjpa_template.service.ProductService;
@@ -34,9 +35,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductResponse createProduct(CreateProductRequest request) {
-        return mapper.toDto(
-                repository.save(
-                        mapper.toEntityCreate(request)));
+        Product product = mapper.toEntityCreate(request);
+
+        product.setAvailable(product.getQuantity() != 0);
+
+        return mapper.toDto(repository.save(product));
     }
 
     @Override
@@ -65,19 +68,33 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
-        this.getProductById(id);
+        ProductResponse product = this.getProductById(id);
+
+        int newStock = request.getQuantity();
+
+        if (newStock < 0) {
+            throw new BusinessRuleException("El stock resultante no puede ser negativo");
+        }
+
+        product.setQuantity(newStock);
+
+        product.setAvailable(product.getQuantity() != 0);
+
         return mapper.toDto(
-                repository.save(
-                        mapper.toEntityUpdate(request, id)
-                )
+                repository.save(mapper.toEntityUpdate(request, id))
         );
     }
 
     @Override
     @Transactional
     public ProductResponse deleteProduct(Long id) {
-        ProductResponse exists = this.getProductById(id);
+        ProductResponse product = this.getProductById(id);
+
+        if (product.getCategory() == Product.Category.INGREDIENT && product.getAvailable()) {
+            throw new BusinessRuleException("No se puede eliminar el producto porque aún tiene existencias en inventario.");
+        }
+        
         repository.deleteById(id);
-        return exists;
+        return product;
     }
 }
