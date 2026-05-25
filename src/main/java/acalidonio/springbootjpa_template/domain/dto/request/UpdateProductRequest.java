@@ -14,9 +14,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateProductRequest {
-    @NotNull(message = "El id es requerido")
-    private Long id;
-    
     private String name;
     private String description;
 

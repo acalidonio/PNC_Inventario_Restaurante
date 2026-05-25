@@ -79,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
-        ProductResponse product = this.getProductById(id);
+        this.getProductById(id);
 
         int newStock = request.getQuantity();
 
@@ -87,13 +87,10 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessRuleException("El stock resultante no puede ser negativo");
         }
 
-        product.setQuantity(newStock);
+        Product productToUpdate = mapper.toEntityUpdate(request, id);
+        productToUpdate.setAvailable(productToUpdate.getQuantity() != 0);
 
-        product.setAvailable(product.getQuantity() != 0);
-
-        return mapper.toDto(
-                repository.save(mapper.toEntityUpdate(request, id))
-        );
+        return mapper.toDto(repository.save(productToUpdate));
     }
 
     @Override
