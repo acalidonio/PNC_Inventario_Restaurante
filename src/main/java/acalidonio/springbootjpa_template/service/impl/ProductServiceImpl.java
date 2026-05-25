@@ -49,8 +49,15 @@ public class ProductServiceImpl implements ProductService {
         if (category == null) {
             productPage = repository.findAll(pageable);
         } else {
+            Product.Category productCategory;
+            try {
+                productCategory = Product.Category.valueOf(category.toUpperCase());
+            } catch (Exception e) {
+                    throw new BusinessRuleException("Invalid category");
+            }
+
             productPage = repository.findByCategoryAndAvailable(
-                    Product.Category.valueOf(category.toUpperCase()), available, pageable
+                    productCategory, available, pageable
             );
         }
 
