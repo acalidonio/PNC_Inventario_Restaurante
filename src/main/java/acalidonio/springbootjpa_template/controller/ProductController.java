@@ -72,7 +72,7 @@ public class ProductController {
             @PathVariable Long id
     ) {
         return buildResponse(
-                "Specimen purged from Sheikah Slate",
+                "Product deleted.",
                 HttpStatus.OK,
                 service.deleteProduct(id)
         );
