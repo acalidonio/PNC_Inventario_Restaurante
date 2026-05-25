@@ -45,7 +45,9 @@ public class ProductController {
     }
 
     @PostMapping("/createProduct")
-    public ResponseEntity<GeneralResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {
+    public ResponseEntity<GeneralResponse> createProduct(
+            @Valid @RequestBody CreateProductRequest request
+    ) {
         return buildResponse(
           "Product created successfully",
           HttpStatus.CREATED,
@@ -57,7 +59,7 @@ public class ProductController {
     @PutMapping("/updateProduct/{id}")
     public ResponseEntity<GeneralResponse> updateProduct(
             @PathVariable Long id,
-            @RequestBody UpdateProductRequest request
+            @Valid @RequestBody UpdateProductRequest request
             ) {
         return buildResponse(
                 "Product details updated successfully",
