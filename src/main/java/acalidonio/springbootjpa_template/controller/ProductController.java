@@ -23,8 +23,8 @@ public class ProductController {
     public ResponseEntity<GeneralResponse> getProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "FOOD") String category,
-            @RequestParam(defaultValue = "true") boolean available
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) boolean available
     ) {
         return buildResponse(
                 "All products retrieved successfully",

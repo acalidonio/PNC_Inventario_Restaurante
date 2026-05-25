@@ -45,10 +45,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PageableResponse<ProductResponse> getAllProducts(int page, int size, String category, boolean available) {
         Pageable pageable = PageRequest.of(page, size);
-
-        Page<Product> productPage = repository.findByCategoryAndAvailable(
-                Product.Category.valueOf(category.toUpperCase()), available, pageable
-        );
+        Page<Product> productPage;
+        if (category == null) {
+            productPage = repository.findAll(pageable);
+        } else {
+            productPage = repository.findByCategoryAndAvailable(
+                    Product.Category.valueOf(category.toUpperCase()), available, pageable
+            );
+        }
 
         Page<ProductResponse> responsePage = mapper.toDtoList(productPage);
 
